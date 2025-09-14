@@ -9,42 +9,57 @@ phases:
 
   pre_build:
     commands:
-      - echo "Creating TypeScript configuration files"
       - |
-        # Create tsconfig.json
+        # Update angular.json with correct output path
+        cat > angular.json << 'EOF'
+        {
+          "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+          "version": 1,
+          "projects": {
+            "angular-cicd-app": {
+              "projectType": "application",
+              "root": "",
+              "sourceRoot": "src",
+              "architect": {
+                "build": {
+                  "builder": "@angular-devkit/build-angular:browser",
+                  "options": {
+                    "outputPath": "dist",
+                    "index": "src/index.html",
+                    "main": "src/main.ts",
+                    "polyfills": ["zone.js"],
+                    "tsConfig": "tsconfig.app.json",
+                    "assets": ["src/favicon.ico", "src/assets"],
+                    "styles": ["src/styles.css"]
+                  },
+                  "configurations": {
+                    "production": {
+                      "outputHashing": "all"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        EOF
+      - |
         cat > tsconfig.json << 'EOF'
         {
           "compileOnSave": false,
           "compilerOptions": {
             "baseUrl": "./",
             "outDir": "./dist/out-tsc",
-            "forceConsistentCasingInFileNames": true,
             "strict": true,
-            "noImplicitOverride": true,
-            "noPropertyAccessFromIndexSignature": true,
-            "noImplicitReturns": true,
-            "noFallthroughCasesInSwitch": true,
-            "sourceMap": true,
-            "declaration": false,
-            "downlevelIteration": true,
             "experimentalDecorators": true,
             "moduleResolution": "node",
-            "importHelpers": true,
             "target": "ES2022",
             "module": "ES2022",
-            "useDefineForClassFields": false,
             "lib": ["ES2022", "dom"]
-          },
-          "angularCompilerOptions": {
-            "enableI18nLegacyMessageIdFormat": false,
-            "strictInjectionParameters": true,
-            "strictInputAccessModifiers": true,
-            "strictTemplates": true
           }
         }
         EOF
       - |
-        # Create tsconfig.app.json with polyfills included
         cat > tsconfig.app.json << 'EOF'
         {
           "extends": "./tsconfig.json",
@@ -52,20 +67,9 @@ phases:
             "outDir": "./out-tsc/app",
             "types": []
           },
-          "files": [
-            "src/main.ts",
-            "src/polyfills.ts"
-          ],
-          "include": [
-            "src/**/*.d.ts"
-          ]
+          "files": ["src/main.ts"],
+          "include": ["src/**/*.d.ts"]
         }
-        EOF
-      - |
-        # Create src/polyfills.ts
-        mkdir -p src
-        cat > src/polyfills.ts << 'EOF'
-        import 'zone.js/dist/zone';
         EOF
 
   build:
@@ -77,4 +81,4 @@ phases:
 artifacts:
   files:
     - '**/*'
-  base-directory: 'dist/angular-cicd-app'
+  base-directory: 'dist'
