@@ -5,31 +5,14 @@ phases:
     runtime-versions:
       nodejs: 18
     commands:
-      - echo "Installing dependencies with Node.js 18"
-      - node --version
-      - npm --version
       - npm install -g @angular/cli@15
-
-  pre_build:
-    commands:
-      - echo "Pre-build phase"
-      - ng version
 
   build:
     commands:
-      - echo "Build phase started"
       - npm install --legacy-peer-deps
       - ng build --configuration production
-      - echo "Build completed"
-      - ls -la dist/
-
-  post_build:
-    commands:
-      - echo "Post-build phase"
-      - ls -la dist/
 
 artifacts:
   files:
     - '**/*'
   base-directory: 'dist/angular-cicd-app'
-  name: angular-app-$(date +%Y-%m-%d-%H-%M-%S)
