@@ -7,10 +7,61 @@ phases:
     commands:
       - npm install -g @angular/cli@15
 
+  pre_build:
+    commands:
+      - echo "Creating all required TypeScript configuration files"
+      - |
+        # Create tsconfig.json
+        cat > tsconfig.json << 'EOF'
+        {
+          "compileOnSave": false,
+          "compilerOptions": {
+            "baseUrl": "./",
+            "outDir": "./dist/out-tsc",
+            "forceConsistentCasingInFileNames": true,
+            "strict": true,
+            "noImplicitOverride": true,
+            "noPropertyAccessFromIndexSignature": true,
+            "noImplicitReturns": true,
+            "noFallthroughCasesInSwitch": true,
+            "sourceMap": true,
+            "declaration": false,
+            "downlevelIteration": true,
+            "experimentalDecorators": true,
+            "moduleResolution": "node",
+            "importHelpers": true,
+            "target": "ES2022",
+            "module": "ES2022",
+            "useDefineForClassFields": false,
+            "lib": ["ES2022", "dom"]
+          },
+          "angularCompilerOptions": {
+            "enableI18nLegacyMessageIdFormat": false,
+            "strictInjectionParameters": true,
+            "strictInputAccessModifiers": true,
+            "strictTemplates": true
+          }
+        }
+        EOF
+      - |
+        # Create tsconfig.app.json
+        cat > tsconfig.app.json << 'EOF'
+        {
+          "extends": "./tsconfig.json",
+          "compilerOptions": {
+            "outDir": "./out-tsc/app",
+            "types": []
+          },
+          "files": ["src/main.ts"],
+          "include": ["src/**/*.d.ts"]
+        }
+        EOF
+
   build:
     commands:
       - npm install --legacy-peer-deps
       - ng build --configuration production
+      - ls -la dist/
 
 artifacts:
   files:
