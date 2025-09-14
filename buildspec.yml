@@ -9,7 +9,7 @@ phases:
 
   pre_build:
     commands:
-      - echo "Creating all required TypeScript configuration files"
+      - echo "Creating TypeScript configuration files"
       - |
         # Create tsconfig.json
         cat > tsconfig.json << 'EOF'
@@ -44,7 +44,7 @@ phases:
         }
         EOF
       - |
-        # Create tsconfig.app.json
+        # Create tsconfig.app.json with polyfills included
         cat > tsconfig.app.json << 'EOF'
         {
           "extends": "./tsconfig.json",
@@ -52,9 +52,20 @@ phases:
             "outDir": "./out-tsc/app",
             "types": []
           },
-          "files": ["src/main.ts"],
-          "include": ["src/**/*.d.ts"]
+          "files": [
+            "src/main.ts",
+            "src/polyfills.ts"
+          ],
+          "include": [
+            "src/**/*.d.ts"
+          ]
         }
+        EOF
+      - |
+        # Create src/polyfills.ts
+        mkdir -p src
+        cat > src/polyfills.ts << 'EOF'
+        import 'zone.js/dist/zone';
         EOF
 
   build:
