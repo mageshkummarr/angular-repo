@@ -1,0 +1,32 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 18
+    commands:
+      - echo "Installing dependencies"
+      - npm install -g @angular/cli
+      - npm install
+
+  pre_build:
+    commands:
+      - echo "Pre-build phase"
+      - ng version
+
+  build:
+    commands:
+      - echo "Build phase started"
+      - ng build --configuration=production
+      - echo "Build completed"
+
+  post_build:
+    commands:
+      - echo "Post-build phase"
+      - ls -la dist/
+
+artifacts:
+  files:
+    - '**/*'
+  base-directory: 'dist/my-angular-app'
+  name: angular-app-$(date +%Y-%m-%d)
