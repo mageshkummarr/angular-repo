@@ -52,7 +52,7 @@ phases:
             "outDir": "./dist/out-tsc",
             "strict": true,
             "experimentalDecorators": true,
-            "moduleResolution": "node",
+            "moduleResolution": node",
             "target": "ES2022",
             "module": "ES2022",
             "lib": ["ES2022", "dom"]
@@ -78,7 +78,18 @@ phases:
       - ng build --configuration production
       - ls -la dist/
 
+  post_build:
+    commands:
+      - echo "Creating deployment package with appspec.yml in root"
+      - mkdir -p deployment
+      - cp -r dist/* deployment/
+      - cp appspec.yml deployment/
+      - cp -r scripts deployment/
+      - chmod +x deployment/scripts/*.sh
+      - echo "Deployment package structure:"
+      - find deployment -type f
+
 artifacts:
   files:
     - '**/*'
-  base-directory: 'dist'
+  base-directory: 'deployment'

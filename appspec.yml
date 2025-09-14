@@ -4,6 +4,9 @@ files:
   - source: /
     destination: /var/www/html
     overwrite: yes
+    except:
+      - appspec.yml
+      - scripts/
 permissions:
   - object: /var/www/html
     owner: apache
