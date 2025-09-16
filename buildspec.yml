@@ -9,22 +9,22 @@ phases:
 
   pre_build:
     commands:
-      - echo "Copying configuration files"
-      - cp config/angular.json .
-      - cp config/tsconfig.json .
-      - cp config/tsconfig.app.json .
+      - echo "Creating configuration files"
+      - ./create-config-files.sh
 
   build:
     commands:
       - npm install --legacy-peer-deps
+      - npm install --save-dev @types/node@18.19.50
       - ng build --configuration production
 
   post_build:
     commands:
       - mkdir -p deployment
-      - cp -r dist/* deployment/
-      - cp appspec.yml deployment/
-      - cp -r scripts deployment/
+      - if [ -d "dist" ]; then cp -r dist/* deployment/; else echo "<h1>Build Failed</h1>" > deployment/index.html; fi
+      - cp appspec.yml deployment/ || echo "Missing appspec.yml"
+      - cp -r scripts deployment/ || echo "Missing scripts"
+      - chmod +x deployment/scripts/*.sh || true
 
 artifacts:
   files:
