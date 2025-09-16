@@ -9,85 +9,22 @@ phases:
 
   pre_build:
     commands:
-      - |
-        # Update angular.json with correct output path
-        cat > angular.json << 'EOF'
-        {
-          "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
-          "version": 1,
-          "projects": {
-            "angular-cicd-app": {
-              "projectType": "application",
-              "root": "",
-              "sourceRoot": "src",
-              "architect": {
-                "build": {
-                  "builder": "@angular-devkit/build-angular:browser",
-                  "options": {
-                    "outputPath": "dist",
-                    "index": "src/index.html",
-                    "main": "src/main.ts",
-                    "polyfills": ["zone.js"],
-                    "tsConfig": "tsconfig.app.json",
-                    "assets": ["src/favicon.ico", "src/assets"],
-                    "styles": ["src/styles.css"]
-                  },
-                  "configurations": {
-                    "production": {
-                      "outputHashing": "all"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-        EOF
-      - |
-        cat > tsconfig.json << 'EOF'
-        {
-          "compileOnSave": false,
-          "compilerOptions": {
-            "baseUrl": "./",
-            "outDir": "./dist/out-tsc",
-            "strict": true,
-            "experimentalDecorators": true,
-            "moduleResolution": node",
-            "target": "ES2022",
-            "module": "ES2022",
-            "lib": ["ES2022", "dom"]
-          }
-        }
-        EOF
-      - |
-        cat > tsconfig.app.json << 'EOF'
-        {
-          "extends": "./tsconfig.json",
-          "compilerOptions": {
-            "outDir": "./out-tsc/app",
-            "types": []
-          },
-          "files": ["src/main.ts"],
-          "include": ["src/**/*.d.ts"]
-        }
-        EOF
+      - echo "Copying configuration files"
+      - cp config/angular.json .
+      - cp config/tsconfig.json .
+      - cp config/tsconfig.app.json .
 
   build:
     commands:
       - npm install --legacy-peer-deps
       - ng build --configuration production
-      - ls -la dist/
 
   post_build:
     commands:
-      - echo "Creating deployment package with appspec.yml in root"
       - mkdir -p deployment
       - cp -r dist/* deployment/
       - cp appspec.yml deployment/
       - cp -r scripts deployment/
-      - chmod +x deployment/scripts/*.sh
-      - echo "Deployment package structure:"
-      - find deployment -type f
 
 artifacts:
   files:
